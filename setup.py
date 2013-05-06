@@ -2,6 +2,7 @@
 
 from distutils.core import setup
 from condiment import __version__
+from os.path import join, dirname
 
 setup(
     name='condiment',
@@ -11,7 +12,7 @@ setup(
     description='Conditionally include code according to environment',
     author='Mathieu Virbel',
     author_email='mat@kivy.org',
-    license=open('LICENSE').read(),
+    license=open(join(dirname(__file__), 'LICENSE')).read(),
     keywords=['python', 'preprocessor', 'meta', 'condiment', 'conditional'],
     platforms='all',
     classifiers = [
