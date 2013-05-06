@@ -37,6 +37,14 @@ both features have been activated
 Or generate the output
 ```
 $ WITH_TIMEBOMB=1 condiment test.py > output.py
+$ cat output.py
+
+print 'timebomb feature is activated'
+
+# ----- FEATURES DEBUGGING -----
+# WITH_TIMEBOMB = 1
+# WITH_INAPP_PURCHASE = 
+# ------------------------------
 ```
 
 Related projects:
