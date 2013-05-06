@@ -12,7 +12,6 @@ setup(
     description='Conditionally include code according to environment',
     author='Mathieu Virbel',
     author_email='mat@kivy.org',
-    license=open(join(dirname(__file__), 'LICENSE')).read(),
     keywords=['python', 'preprocessor', 'meta', 'condiment', 'conditional'],
     platforms='all',
     classifiers = [
