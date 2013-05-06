@@ -3,10 +3,10 @@
 Condiment
 ---------
 
-Conditionally include or remove code portion, according to activated features.
+Conditionally include or remove code portion, according to the environment.
 '''
 
-__version__ = '0.1'
+__version__ = '0.2'
 
 from os import environ, remove
 from os.path import join, dirname, basename
@@ -211,7 +211,8 @@ class Parser(object):
 def install(**kwargs):
     Parser(**kwargs).install()
 
-if __name__ == '__main__':
+
+def run():
     import argparse
     parser = argparse.ArgumentParser(
         description='Activate features depending of the environment.')
@@ -221,3 +222,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     Parser(input=args.input[0], output=sys.stdout, inplace=args.inplace).do()
 
+
+if __name__ == '__main__':
+    run()

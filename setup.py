@@ -6,7 +6,7 @@ from condiment import __version__
 setup(
     name='condiment',
     py_modules=['condiment'],
-    scripts=['condiment'],
+    scripts=['scripts/condiment'],
     version=__version__,
     description='Conditionally include code according to environment',
     author='Mathieu Virbel',
