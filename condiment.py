@@ -220,7 +220,7 @@ def run():
         help='Source file to process')
 
     args = parser.parse_args()
-    Parser(input=args.input[0], output=sys.stdout, inplace=args.inplace).do()
+    Parser(input=args.input[0], output=sys.stdout).do()
 
 
 if __name__ == '__main__':
