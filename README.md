@@ -4,8 +4,8 @@ Condiment
 Conditionally include or remove code portion, according to the environment. It
 support offline and on-thy-fly preprocessing.
 
-Conditionnal features
----------------------
+Conditional features
+--------------------
 
 Let's say you want to release a version of your code with or without a feature,
 like unlimited life in a game. It can be useful during development, but you
@@ -27,7 +27,6 @@ class Player:
 		if not WITH_GODMODE:
 			self.life -= 1
 		return self.life
-
 ```
 
 You can run it without the godmode:
@@ -53,7 +52,6 @@ class Player:
 	def die(self):
 		self.life -= 1
 		return self.life
-
 ```
 
 Replacing variables
@@ -80,7 +78,6 @@ class Player:
 		if not WITH_GODMODE:
 			self.life -= 1
 		return self.life
-
 ```
 
 
