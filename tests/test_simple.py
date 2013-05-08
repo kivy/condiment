@@ -3,7 +3,8 @@ import condiment; condiment.install()
 #endexclude
 
 if WITH_TIMEBOMB:
-    print 'timebomb feature is activated'
+    timebomb = int(WITH_TIMEBOMB)
+    print 'timebomb feature is activated, and set to', timebomb
 
 if WITH_INAPP_PURCHASE:
     print 'inapp purchase feature is activated'

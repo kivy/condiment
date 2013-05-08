@@ -12,6 +12,7 @@ from os import environ, remove
 from os.path import join, dirname, basename
 from itertools import chain
 from copy import copy
+from re import split
 import datetime
 import inspect
 import ast
@@ -126,6 +127,14 @@ class Parser(object):
         for line in self._state_detect():
             yield line
 
+    def _replace_defs(self, line):
+        words = split('(\w+)', line)
+        for key, value in self.eval_dict.items():
+            for index, word in enumerate(words):
+                if word == key:
+                    words[index] = value
+        return ''.join(words)
+
     def _state_detect(self):
         for index, line in self.iterator:
             sline = line.strip()
@@ -141,7 +150,7 @@ class Parser(object):
                 self._read_exclude_block()
 
             else:
-                yield index, line
+                yield index, self._replace_defs(line)
 
     def _read_exclude_block(self):
         for index, line in self.iterator:
