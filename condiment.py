@@ -6,12 +6,13 @@ Condiment
 Conditionally include or remove code portion, according to the environment.
 '''
 
-__version__ = '0.3'
+__version__ = '0.4'
 
 from os import environ, remove
 from os.path import join, dirname, basename
 from itertools import chain
 from copy import copy
+import datetime
 import inspect
 import ast
 import sys
@@ -45,6 +46,8 @@ class Parser(object):
         self.eval_dict = {}
         self.output = output
         self.input = input
+        self.output_name = None
+        self.output_package = None
 
     def install(self):
 
@@ -55,6 +58,8 @@ class Parser(object):
         # check who is calling us, and ensure it's a python file
         frame = stack[2]
         filename = frame[1]
+        self.output_name = frame[0].f_globals.get('__name__')
+        self.output_package = frame[0].f_globals.get('__package__')
         assert(filename.endswith('.py'))
         self.input = filename
 
@@ -65,7 +70,14 @@ class Parser(object):
         self.do()
 
     def do(self):
+        if imp.lock_held() is True:
+            # inject global variables instead of rewriting the file
+            self.do_inject()
+        else:
+            # just rewrite
+            self.do_rewrite()
 
+    def do_rewrite(self):
         if self.output is sys.stdout:
             fd = self.output
         else:
@@ -75,33 +87,28 @@ class Parser(object):
             for index, line in self.parse(self.input):
                 fd.write(line)
 
-            fd.write('\n# ----- FEATURES DEBUGGING -----\n')
+            now = datetime.datetime.now()
+            fd.write('\n# ----- CONDIMENT VARIABLES -----\n')
+            fd.write('# Generated at {}\n'.format(now.strftime("%Y-%m-%d %H:%M")))
             for key, value in self.eval_dict.items():
                 fd.write('# {} = {}\n'.format(key, value))
-            fd.write('# ------------------------------\n')
+            fd.write('# ---------------------------------\n')
         finally:
             if self.output is not sys.stdout:
                 fd.close()
 
         # replace
         if self.output is not sys.stdout:
-            if imp.lock_held() is True:
-                self.override_import()
-            else:
-                self.on_the_fly()
-                sys.exit(0)
+            self.on_the_fly()
+            sys.exit(0)
 
-    def override_import(self):
-        try:
-            moduleName = self.input.split('.')[0]
-            tmpModuleName = self.output.split('.')[0]
-            del sys.modules[moduleName]
-            sys.modules[tmpModuleName] = __import__(tmpModuleName)
-            sys.modules[moduleName] = __import__(tmpModuleName)
-        finally:
-            # remove tmp (.py & .pyc) files
-            remove(self.output)
-            remove(self.output + 'c')
+    def do_inject(self):
+        for index, line in self.parse(self.input):
+            pass
+
+        modname = self.output_name
+        for key, value in self.eval_dict.items():
+            setattr(sys.modules[modname], key, value)
 
     def on_the_fly(self):
         try:
