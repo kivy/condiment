@@ -1,53 +1,93 @@
 Condiment
----------
+=========
 
-Conditionally include or remove code portion, according to the environment.
+Conditionally include or remove code portion, according to the environment. It
+support offline and on-thy-fly preprocessing.
 
-For example, this is test.py:
+Conditionnal features
+---------------------
+
+Let's say you want to release a version of your code with or without a feature,
+like unlimited life in a game. It can be useful during development, but you
+don't want the code to be available in production.
+
+Condiment recognize the environment variables that starts with the prefix
+"WITH_" all uppercase. We could name our feature: `WITH_GODMODE`.
+In python, you need to include condiment, and install it. You can put it in
+exclude block, in order to be removed during the offline preprocessing.
+
 ```python
 #exclude
 import condiment; condiment.install()
 #endexclude
 
-if WITH_TIMEBOMB:
-    print 'timebomb feature is activated'
+class Player:
 
-if WITH_INAPP_PURCHASE:
-    print 'inapp purchase feature is activated'
-
-if WITH_TIMEBOMB and WITH_INAPP_PURCHASE:
-    print 'both features have been activated'
-```
-
-If `WITH_TIMEBOMB` is declared in the env, all the sections concerning the
-token will be included. All the others will be removed.
-
-You can run it directly:
+	def die(self):
+		if not WITH_GODMODE:
+			self.life -= 1
+		return self.life
 
 ```
-$ python test.py
-$ WITH_TIMEBOMB=1 python test.py
-timebomb feature is activated
-$ WITH_INAPP_PURCHASE=1 WITH_TIMEBOMB=1 python test.py
-timebomb feature is activated
-inapp purchase feature is activated
-both features have been activated
+
+You can run it without the godmode:
+
+```
+$ python main.py
 ```
 
-Or generate the output
+Or by activating the godmode at runtime:
+
 ```
-$ WITH_TIMEBOMB=1 condiment test.py > output.py
-$ cat output.py
-
-print 'timebomb feature is activated'
-
-# ----- FEATURES DEBUGGING -----
-# WITH_TIMEBOMB = 1
-# WITH_INAPP_PURCHASE = 
-# ------------------------------
+$ WITH_GODMODE=1 python main.py
 ```
 
-Compared to others preprocessor project:
+You can generate the final version for production too:
+
+```
+$ WITH_GODMODE=1 condiment main.py > prod_main.py
+$ cat prod_main.py
+
+class Player:
+
+	def die(self):
+		self.life -= 1
+		return self.life
+
+```
+
+Replacing variables
+-------------------
+
+If you want to set an initial value, all the token founds in the environment
+will be replaced during the generation. For example, a `WITH_LIFE` token could
+have the initial number of life.
+
+```python
+#exclude
+import condiment; condiment.install()
+#endexclude
+
+class Player:
+
+	def __init__(self):
+		Player.__init__(self)
+		self.life = 10
+		if WITH_LIFE:
+			self.life = WITH_LIFE
+
+	def die(self):
+		if not WITH_GODMODE:
+			self.life -= 1
+		return self.life
+
+```
+
+
+Why using condiment ?
+---------------------
+
+Compared to others existing preprocessor:
 
 - condiment doesn't rewrite the module on import, it will just inject the
   detected variables in the globals() of the module. This is avoiding double
@@ -56,8 +96,10 @@ Compared to others preprocessor project:
 - condiment doesn't need you to declare the variable prior the usage of them.
   Using environment variables allow you to declare them before launching the
   app, and change the behavior of your app easilly.
+- condiment will replace all the variables in offline version.
 
-Related projects:
+Related projects
+----------------
 
 - pypreprocessor
 - preprocess
