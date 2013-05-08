@@ -47,6 +47,16 @@ print 'timebomb feature is activated'
 # ------------------------------
 ```
 
+Compared to others preprocessor project:
+
+- condiment doesn't rewrite the module on import, it will just inject the
+  detected variables in the globals() of the module. This is avoiding double
+  import of your module.
+- condiment use python expression for condition (only on if)
+- condiment doesn't need you to declare the variable prior the usage of them.
+  Using environment variables allow you to declare them before launching the
+  app, and change the behavior of your app easilly.
+
 Related projects:
 
 - pypreprocessor
