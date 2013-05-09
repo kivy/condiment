@@ -6,7 +6,7 @@ Condiment
 Conditionally include or remove code portion, according to the environment.
 '''
 
-__version__ = '0.5'
+__version__ = '0.5.2'
 
 from os import environ, remove
 from os.path import join, dirname, basename
