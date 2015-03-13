@@ -13,6 +13,7 @@ from os.path import join, dirname, basename
 from itertools import chain
 from copy import copy
 from re import split
+from runpy import run_path
 import datetime
 import inspect
 import ast
@@ -113,7 +114,7 @@ class Parser(object):
 
     def on_the_fly(self):
         try:
-            exec(open(self.output, 'rb').read())
+            run_path(self.output)
         finally:
             if type(self.output) is not file:
                 remove(self.output)
