@@ -13,6 +13,7 @@ from os.path import join, dirname, basename
 from itertools import chain
 from copy import copy
 from re import split
+from codecs import open
 from runpy import run_path
 import datetime
 import inspect
@@ -21,6 +22,10 @@ import sys
 import imp
 
 is_py3 = sys.version >= '3'
+
+if is_py3:
+    from io import IOBase as file
+
 
 class Iterator:
     def __init__(self, iterator):
@@ -87,14 +92,16 @@ class Parser(object):
 
         try:
             for index, line in self.parse(self.input):
-                fd.write(line)
+                fd.write(line.encode('utf-8'))
 
             now = datetime.datetime.now()
-            fd.write('\n# ----- CONDIMENT VARIABLES -----\n')
-            fd.write('# Generated at {}\n'.format(now.strftime("%Y-%m-%d %H:%M")))
+            fd.write(b'\n# ----- CONDIMENT VARIABLES -----\n')
+            fd.write('# Generated at {}\n'
+                     .format(now.strftime("%Y-%m-%d %H:%M"))
+                     .encode('utf-8'))
             for key, value in self.eval_dict.items():
-                fd.write('# {} = {}\n'.format(key, value))
-            fd.write('# ---------------------------------\n')
+                fd.write('# {} = {}\n'.format(key, value).encode('utf-8'))
+            fd.write(b'# ---------------------------------\n')
         finally:
             if self.output is not sys.stdout:
                 fd.close()
@@ -116,7 +123,7 @@ class Parser(object):
         try:
             run_path(self.output)
         finally:
-            if type(self.output) is not file:
+            if not isinstance(self.output, file):
                 remove(self.output)
 
     def parse(self, filename):
