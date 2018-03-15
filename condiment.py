@@ -92,7 +92,10 @@ class Parser(object):
 
         try:
             for index, line in self.parse(self.input):
-                fd.write(line.encode('utf-8'))
+                if isinstance(line, bytes):
+                    fd.write(line)
+                else:
+                    fd.write(line.encode('utf-8'))
 
             now = datetime.datetime.now()
             fd.write(b'\n# ----- CONDIMENT VARIABLES -----\n')
