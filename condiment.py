@@ -118,7 +118,8 @@ class Parser(object):
         # replace
         if self.output is not sys.stdout:
             self.on_the_fly()
-            sys.exit(0)
+            if self.output_name == '__main__':
+                sys.exit(0)
 
     def do_inject(self):
         for index, line in self.parse(self.input):
