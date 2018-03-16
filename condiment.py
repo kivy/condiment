@@ -11,6 +11,7 @@ __version__ = '0.6'
 from os import environ, remove
 from os.path import join, dirname, basename
 from itertools import chain
+from functools import partial
 from copy import copy
 from re import split
 from codecs import open
@@ -84,27 +85,32 @@ class Parser(object):
             # just rewrite
             self.do_rewrite()
 
+    @staticmethod
+    def _fd_write(fd, encode, s):
+        if encode:
+            fd.write(s.encode('utf8'))
+        else:
+            fd.write(s)
+
     def do_rewrite(self):
         if self.output is sys.stdout:
             fd = self.output
+            fd_write = partial(self._fd_write, fd, False)
         else:
             fd = open(self.output, 'wb')
+            fd_write = partial(self._fd_write, fd, True)
 
         try:
             for index, line in self.parse(self.input):
-                if isinstance(line, bytes):
-                    fd.write(line)
-                else:
-                    fd.write(line.encode('utf-8'))
+                fd_write(line)
 
             now = datetime.datetime.now()
-            fd.write(b'\n# ----- CONDIMENT VARIABLES -----\n')
-            fd.write('# Generated at {}\n'
-                     .format(now.strftime("%Y-%m-%d %H:%M"))
-                     .encode('utf-8'))
+            fd_write('\n# ----- CONDIMENT VARIABLES -----\n')
+            fd_write('# Generated at {}\n'
+                     .format(now.strftime("%Y-%m-%d %H:%M")))
             for key, value in self.eval_dict.items():
-                fd.write('# {} = {}\n'.format(key, value).encode('utf-8'))
-            fd.write(b'# ---------------------------------\n')
+                fd_write('# {} = {}\n'.format(key, value))
+            fd_write('# ---------------------------------\n')
         finally:
             if self.output is not sys.stdout:
                 fd.close()
