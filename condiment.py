@@ -21,6 +21,7 @@ import inspect
 import ast
 import sys
 import imp
+import re
 
 is_py3 = sys.version >= '3'
 
@@ -137,7 +138,23 @@ class Parser(object):
                 remove(self.output)
 
     def parse(self, filename):
-        with open(filename, 'r') as fd:
+        r = re.compile(
+            r"^[ \t\v]*#.*?coding[:=][ \t]*([-_.a-zA-Z0-9]+)")
+
+        if is_py3:
+            encoding = 'utf8'
+        else:
+            encoding = 'ascii'
+
+        with open(filename, 'rb', encoding, errors='ignore') as fd:
+            for i in range(2):
+                line = fd.readline()
+                matches = r.findall(line)
+                if matches:
+                    encoding = matches[0]
+                    break
+
+        with open(filename, 'r', encoding=encoding) as fd:
             lines = fd.readlines()
 
         # share iterator accross all the states
