@@ -76,15 +76,15 @@ class Parser(object):
         self.output = join(dirname(filename),
                 '_ft_{}'.format(basename(filename)))
 
-        self.do()
+        self.do(run=True)
 
-    def do(self):
+    def do(self, run=False):
         if imp.lock_held() is True:
             # inject global variables instead of rewriting the file
             self.do_inject()
         else:
             # just rewrite
-            self.do_rewrite()
+            self.do_rewrite(run=run)
 
     @staticmethod
     def _fd_write(fd, encode, s):
@@ -93,7 +93,7 @@ class Parser(object):
         else:
             fd.write(s)
 
-    def do_rewrite(self):
+    def do_rewrite(self, run=False):
         if self.output is sys.stdout:
             fd = self.output
             fd_write = partial(self._fd_write, fd, False)
@@ -116,8 +116,7 @@ class Parser(object):
             if self.output is not sys.stdout:
                 fd.close()
 
-        # replace
-        if self.output is not sys.stdout:
+        if run:
             self.on_the_fly()
             if self.output_name == '__main__':
                 sys.exit(0)
@@ -267,11 +266,18 @@ def run():
     import argparse
     parser = argparse.ArgumentParser(
         description='Activate features depending of the environment.')
-    parser.add_argument('input', metavar='source.py', nargs=1,
-        help='Source file to process')
+    parser.add_argument(
+        'input', metavar='source.py', nargs=1,
+        help='Source file to process'
+    )
+    parser.add_argument(
+        '-o', '--output', metavar='output', nargs='+',
+        default=[sys.stdout],
+        help='output file'
+    )
 
     args = parser.parse_args()
-    Parser(input=args.input[0], output=sys.stdout).do()
+    Parser(input=args.input[0], output=args.output[0]).do()
 
 
 if __name__ == '__main__':
