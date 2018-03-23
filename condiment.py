@@ -73,8 +73,9 @@ class Parser(object):
         self.input = filename
 
         # generate an output filename
-        self.output = join(dirname(filename),
-                '_ft_{}'.format(basename(filename)))
+        self.output = join(
+            dirname(filename), '_ft_{}'.format(basename(filename))
+        )
 
         self.do(run=True)
 
@@ -134,7 +135,10 @@ class Parser(object):
             run_path(self.output)
         finally:
             if not isinstance(self.output, file):
-                remove(self.output)
+                try:
+                    remove(self.output)
+                except Exception:
+                    pass
 
     def parse(self, filename):
         r = re.compile(
